@@ -1,0 +1,102 @@
+{% extends "master.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+Ta-Do
+{% endblock %}
+
+{% block content %}
+
+    {% if not request.user.is_authenticated %} <!-- Show Welcome Screen For unsigned in users -->
+
+        <div class="px-4 pt-5 my-5 text-center border-bottom">
+            <h1 class="display-4 fw-bold text-body-emphasis">Welcome To Ta-Do!</h1>
+            <div class="col-lg-6 mx-auto"> <p class="lead mb-4">Create, Organize, and Designate Tasks with this highly customizable To-Do list application! Just create an account to get started.</p>
+            </div>
+            <div class="overflow-hidden" style="max-height: 30vh;">
+                <div class="container px-5"> <img src="bootstrap-docs.png" class="img-fluid border rounded-3 shadow-lg mb-4" alt="Replace w/ example when finished" width="700" height="500" loading="lazy"> </div> <!--TODO: setup example image-->
+            </div>
+        </div>
+
+    {% else %}
+
+<!-- TODO: Fix task creation prompt when user has default general group but no tasks -->
+        {% if not group_task_pairs %} <!-- If the user has no created tasks, prompt them to make one -->
+
+            <div class="p-5 text-center bg-body-tertiary">
+                <div class="container py-5">
+                    <h1 class="text-body-emphasis">Looks Like You Don't Have Any Tasks To Do...</h1>
+                    <p class="col-lg-8 mx-auto lead">
+                        If you'd like to create one, just click the button below.
+                    </p>
+                    <a href="{% url 'create_task_page' %}" class="btn btn-primary px-5 mb-5">
+                        Create A Task
+                    </a>
+                </div>
+            </div>
+
+        {% else %} <!-- Display tasks for logged-in users -->
+
+            <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
+                {% for pair in group_task_pairs %}
+                    <div class="mb-5">  <!-- wrapper for each TaskGroup -->
+                        {% with group=pair.0 tasks=pair.1 %}  <!-- have to assign group and tasks as variables because Django doesn't allow iteration over multiple variables in tuples -->
+                            <h1 class="mb-4 text-center"> <!-- Display group name -->
+                                <a href="{% url 'show_task_group_page' group.id %}" style="text-decoration: underline; color: inherit;">
+                                    {{ group.title }}
+                                </a>
+                            </h1>
+                            {% if tasks %}  <!-- Display relevant tasks per group if present -->        <!-- TODO: standardize task box size as well as underline size for group -->
+                                {% for task in tasks %}
+                                    {% if task.parent_task is None %} <!-- Don't show any subtasks -->
+                                        <div class="list-group">
+                                            <label class="list-group-item d-flex gap-3">
+                                                <input class="task-checkbox form-check-input flex-shrink-0"
+                                                       type="checkbox"
+                                                       data-task-id="{{ task.id }}"
+                                                       style="font-size: 1.375em;"
+                                                        {% if task.completed %}checked{% endif %}>  <!-- render checkbox checked if Task is completed in DB -->
+
+                                                <span class="pt-1 form-checked-content">
+                                                    <a href="{% url 'show_task_page' task.id %}"
+                                                        class="task-link task-title text-body text-decoration-none
+                                                        {% if task.urgency >= 3 %} fw-bold {% endif %}
+                                                        {% if task.urgency >= 4 %} text-decoration-underline {% endif %}
+                                                        {% if task.completed %} text-decoration-line-through {% endif %}"> <!-- strikethrough if completed --> <!-- TODO: make overdue tasks red -->
+                                                         {{ task.title }}
+                                                    </a>
+
+                                                    <small class="d-block text-body-secondary">
+                                                        {% if task.urgency == 5 %} <!-- show exclamation mark svg for critical tasks -->
+                                                            <img src="{% static 'images/exclamation-circle.svg' %}" alt="critical task" width="16" height="16" class="me-1 text-danger">
+                                                            {{ task.due_date }}
+                                                        {% else %} <!-- show calendar svg for all other tasks -->
+                                                            <img src="{% static 'images/calendar-event.svg' %}" alt="due date on calendar" width="16" height="16" class="me-1">
+                                                            {{ task.due_date }}
+                                                        {% endif %}
+                                                    </small>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %} <!-- Display for empty groups -->
+                                <p class="text-center mt-3">No tasks in this group.</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                {% endfor %}
+
+            </div>
+
+{% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<!--Django will generate the correct base URL for toggling-->
+<script>
+    window.toggleTaskUrlTemplate = "{% url 'toggle_task' 0 %}".replace("0", "{id}");
+</script>
+{% endblock %}

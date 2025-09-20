@@ -1,0 +1,38 @@
+{% extends "registration/registration_master.html" %}
+{% load static %}
+
+{% block title %}Ta-Do Login{% endblock %}
+
+{% block content %}
+
+  <div class="d-flex justify-content-center align-items-start min-vh-100 bg-body-tertiary" style="padding-top: 5rem;">
+    <main class="form-signin w-100" style="max-width: 400px;">
+      <form method="post"
+            class="p-4 border rounded shadow-sm"
+            style="background-color: #212529; color: #ffffff;">
+        {% csrf_token %}
+        <div class="text-center mb-3">
+          <img src="{% static 'images/checklist-icon.png' %}" alt="Checklist logo" width="72" height="57">
+        </div>
+        <h1 class="h3 mb-3 fw-normal text-center">Login</h1>
+
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="floatingUsername" name="username" placeholder="Username" required>
+          <label for="floatingUsername">Username</label>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
+          <label for="floatingPassword">Password</label>
+        </div>
+
+        <button class="btn btn-primary w-100 py-2 mb-2" type="submit">Login</button>
+
+        {% if error %}
+        <p class="mt-2 text-danger text-center">{{ error }}</p>
+        {% endif %}
+      </form>
+    </main>
+  </div>
+
+{% endblock %}

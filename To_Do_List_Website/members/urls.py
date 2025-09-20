@@ -2,5 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('members/', views.list_members, name='members'),
+    path("login/", views.login_func, name="login_page"),
+    path("logout/", views.logout_func, name="logout_page"),
+    path("signup/", views.signup_func, name="signup_page"),
 ]

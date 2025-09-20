@@ -23,8 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-4!^8#-=_4hg!$$0buz@vf0v&nhsbuext=#g%pq0*43h-0^(ms%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+#TODO: set debug to False before posting to github
 DEBUG = True
 
+#TODO
+'''Important: When DEBUG = False, Django requires you to specify the hosts you will allow this Django project to run from.
+
+In production, this should be replaced with a proper domain name:
+
+ALLOWED_HOSTS = ['yourdomain.com']'''
 ALLOWED_HOSTS = []
 
 
@@ -37,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'members',
+    "members.apps.MembersConfig",
+    'tasktracker',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +63,7 @@ ROOT_URLCONF = 'To_Do_List_Website.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,8 +127,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+

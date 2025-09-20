@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from tasktracker import views as task_views
+from members import views as member_views
 
 urlpatterns = [
-    path('', include('members.urls')),
     path('admin/', admin.site.urls),
+    path('members/', include('members.urls')), # Routes /members/... to the members app
+    path('', task_views.main, name='home_page'),  # root domain /
+    path('tasks/', include('tasktracker.urls')), # Routes /tasks/... to the tasktracker app
 ]

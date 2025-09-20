@@ -1,0 +1,144 @@
+{% extends "master.html" %}
+{% load static %}
+
+{% block title %}
+{{ task.title }}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <!-- Task Title -->
+    <div class="d-flex align-items-center justify-content-center mb-4">
+        <input class="task-checkbox form-check-input me-2"
+               type="checkbox"
+               data-task-id="{{ task.id }}"
+               style="font-size: 1.5em;"
+               {% if task.completed %}checked{% endif %}> <!-- Parent task checkbox -->
+        <h1 class="task-title text-center text-decoration-underline mb-0">{{ task.title }}</h1>
+    </div>
+
+    <!-- Task Description -->
+    {% if task.description %}
+    <p class="text-center fs-5 mb-4">{{ task.description }}</p>
+    {% endif %}
+
+    <!-- Two-column layout for descriptors and data -->
+    <div class="row justify-content-center mb-4">
+
+        <!-- Left column: descriptors, right-aligned -->
+        <div class="col-md-3 text-end fw-bold">
+            <p>Urgency:</p>
+            <p>Deadline:</p>
+            <p>Subtasks:</p>
+        </div>
+
+        <!-- Right column: task data -->
+        <div class="col-md-6 text-start">
+            <p>
+                {% if task.urgency == 5 %}
+                <span class="text-danger">{{ task.get_urgency_display }}</span>
+                {% else %}
+                {{ task.get_urgency_display }}
+                {% endif %}
+            </p>
+            <p>{{ task.due_date }}</p>
+
+            {% if not subtasks %}
+            <p>None</p>
+            {% else %}
+            <div class="d-flex flex-column gap-2 align-items-start"> <!-- ensures children don't stretch full width -->
+                {% for subtask in subtasks %}
+                <div class="card p-2 d-inline-flex flex-row align-items-center"> <!-- d-inline-flex prevents full column width -->
+                    <input class="task-checkbox form-check-input flex-shrink-0 me-2"
+                           type="checkbox"
+                           data-task-id="{{ subtask.id }}"
+                           data-parent-id="{{ task.id }}"
+                           {% if task.completed or subtask.completed %}checked{% endif %}> <!-- inherit parent completion -->
+                    <div>
+                        <a href="{% url 'show_task_page' subtask.id %}"
+                           class="task-link task-title text-body text-decoration-none
+                           {% if subtask.urgency >= 3 %} fw-bold {% endif %}
+                           {% if subtask.urgency >= 4 %} text-decoration-underline {% endif %}
+                           {% if task.completed or subtask.completed %} text-decoration-line-through {% endif %}">
+                            {{ subtask.title }}
+                        </a>
+                        <small class="d-block text-body-secondary">
+                            {% if subtask.urgency == 5 %}
+                            <img src="{% static 'images/exclamation-circle.svg' %}" width="16" height="16" class="me-1 text-danger">
+                            {{ subtask.due_date }}
+                            {% else %}
+                            <img src="{% static 'images/calendar-event.svg' %}" width="16" height="16" class="me-1">
+                            {{ subtask.due_date }}
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="text-center">
+        {% if task.parent_task == None %} <!-- Only allow creation of subtasks for non-subtasks -->
+            <a href="{% url 'create_subtask_page' task.id %}" class="btn btn-primary btn-md w-10">Create Subtask</a>
+        {% endif %}
+        <a href="{% url 'edit_task_page' task.id %}" class="btn btn-info btn-md w-10">Edit Task</a>
+        <!-- Delete button (triggers modal) -->
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGroupModal{{ group.id }}"> Delete Task </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="deleteGroupModal{{ group.id }}" tabindex="-1"
+             aria-labelledby="deleteGroupModalLabel{{ group.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteGroupModalLabel{{ group.id }}">
+                            Delete "{{ task.title }}"?
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    {% if subtasks %} <!-- Show different messages for deleting tasks and subtasks -->
+                        <div class="modal-body">
+                            <p>
+                                Deleting this task will also <strong>delete all associated subtasks</strong>.
+                                Are you sure you want to continue?
+                            </p>
+                        </div>
+                    {% else %}
+                        <div class="modal-body">
+                            <p>
+                                Deleting this task will <strong>not</strong> be reversible.
+                                Are you sure you want to continue?
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    <div class="modal-footer">
+                        <form method="post" action="{% url 'delete_task' task.id %}">
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Yes, delete</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!--Django will generate the correct base URL for toggling-->
+<script>
+    window.toggleTaskUrlTemplate = "{% url 'toggle_task' 0 %}".replace("0", "{id}");
+</script>
+<script src="{% static 'tasks/task_toggle.js' %}" defer></script>
+{% endblock %}

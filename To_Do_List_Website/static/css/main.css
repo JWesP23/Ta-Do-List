@@ -1,0 +1,6 @@
+/* Default tasks (urgency < 4): underline only on hover */
+.task-link:not(.text-decoration-underline):hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #37052b;
+}
