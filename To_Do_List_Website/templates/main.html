@@ -14,14 +14,18 @@ Ta-Do
             <h1 class="display-4 fw-bold text-body-emphasis">Welcome To Ta-Do!</h1>
             <div class="col-lg-6 mx-auto"> <p class="lead mb-4">Create, Organize, and Designate Tasks with this highly customizable To-Do list application! Just create an account to get started.</p>
             </div>
-            <div class="overflow-hidden" style="max-height: 30vh;">
-                <div class="container px-5"> <img src="bootstrap-docs.png" class="img-fluid border rounded-3 shadow-lg mb-4" alt="Replace w/ example when finished" width="700" height="500" loading="lazy"> </div> <!--TODO: setup example image-->
+            <div class="overflow-hidden">
+                <div class="text-center">
+                    <img src="{% static 'images/example_image.png' %}"
+                         class="img-fluid border rounded-3 shadow-lg mb-4"
+                         alt="Replace w/ example when finished"
+                         style="max-width: 900px; height: auto;">
+                </div>
             </div>
         </div>
 
     {% else %}
 
-<!-- TODO: Fix task creation prompt when user has default general group but no tasks -->
         {% if not group_task_pairs %} <!-- If the user has no created tasks, prompt them to make one -->
 
             <div class="p-5 text-center bg-body-tertiary">
@@ -38,56 +42,72 @@ Ta-Do
 
         {% else %} <!-- Display tasks for logged-in users -->
 
-            <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
-                {% for pair in group_task_pairs %}
-                    <div class="mb-5">  <!-- wrapper for each TaskGroup -->
-                        {% with group=pair.0 tasks=pair.1 %}  <!-- have to assign group and tasks as variables because Django doesn't allow iteration over multiple variables in tuples -->
-                            <h1 class="mb-4 text-center"> <!-- Display group name -->
-                                <a href="{% url 'show_task_group_page' group.id %}" style="text-decoration: underline; color: inherit;">
+            <div class="container my-4">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for pair in group_task_pairs %}
+                    {% with group=pair.0 tasks=pair.1 %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm d-flex flex-column">
+                            <!-- Group title -->
+                            <div class="card-header text-center bg-light">
+                                <a href="{% url 'show_task_group_page' group.id %}"
+                                   class="text-decoration-underline text-dark fw-bold">
                                     {{ group.title }}
                                 </a>
-                            </h1>
-                            {% if tasks %}  <!-- Display relevant tasks per group if present -->        <!-- TODO: standardize task box size as well as underline size for group -->
-                                {% for task in tasks %}
-                                    {% if task.parent_task is None %} <!-- Don't show any subtasks -->
-                                        <div class="list-group">
-                                            <label class="list-group-item d-flex gap-3">
-                                                <input class="task-checkbox form-check-input flex-shrink-0"
-                                                       type="checkbox"
-                                                       data-task-id="{{ task.id }}"
-                                                       style="font-size: 1.375em;"
-                                                        {% if task.completed %}checked{% endif %}>  <!-- render checkbox checked if Task is completed in DB -->
+                            </div>
 
-                                                <span class="pt-1 form-checked-content">
-                                                    <a href="{% url 'show_task_page' task.id %}"
-                                                        class="task-link task-title text-body text-decoration-none
-                                                        {% if task.urgency >= 3 %} fw-bold {% endif %}
-                                                        {% if task.urgency >= 4 %} text-decoration-underline {% endif %}
-                                                        {% if task.completed %} text-decoration-line-through {% endif %}"> <!-- strikethrough if completed --> <!-- TODO: make overdue tasks red -->
-                                                         {{ task.title }}
-                                                    </a>
+                            <!-- Task list -->
+                            <div class="card-body d-flex flex-column">
+                                {% if tasks %}
+                                <ul class="list-group list-group-flush flex-grow-1">
+                                    {% for task in tasks %}
+                                    {% if task.parent_task is None %}
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <input class="task-checkbox form-check-input me-2 flex-shrink-0"
+                                               type="checkbox"
+                                               data-task-id="{{ task.id }}"
+                                               style="font-size: 1.25em;"
+                                               {% if task.completed %}checked{% endif %}>
 
-                                                    <small class="d-block text-body-secondary">
-                                                        {% if task.urgency == 5 %} <!-- show exclamation mark svg for critical tasks -->
-                                                            <img src="{% static 'images/exclamation-circle.svg' %}" alt="critical task" width="16" height="16" class="me-1 text-danger">
-                                                            {{ task.due_date }}
-                                                        {% else %} <!-- show calendar svg for all other tasks -->
-                                                            <img src="{% static 'images/calendar-event.svg' %}" alt="due date on calendar" width="16" height="16" class="me-1">
-                                                            {{ task.due_date }}
-                                                        {% endif %}
-                                                    </small>
-                                                </span>
-                                            </label>
-                                        </div>
+                                        <span class="flex-grow-1">
+                                      <a href="{% url 'show_task_page' task.id %}"
+                                         class="task-link task-title text-body text-decoration-none
+                                                {% if task.urgency >= 3 %} fw-bold {% endif %}
+                                                {% if task.urgency >= 4 %} text-decoration-underline {% endif %}
+                                                {% if task.completed %} text-decoration-line-through {% endif %}">
+                                        {{ task.title }}
+                                      </a>
+                                      <small class="d-block text-body-secondary">
+                                        {% if task.urgency == 5 %}
+                                          <img src="{% static 'images/exclamation-circle.svg' %}" alt="critical" width="16" height="16" class="me-1 text-danger">
+                                          {{ task.due_date }}
+                                        {% else %}
+                                          <img src="{% static 'images/calendar-event.svg' %}" alt="due date" width="16" height="16" class="me-1">
+                                          {{ task.due_date }}
+                                        {% endif %}
+                                      </small>
+                                    </span>
+                                    </li>
                                     {% endif %}
-                                {% endfor %}
-                            {% else %} <!-- Display for empty groups -->
-                                <p class="text-center mt-3">No tasks in this group.</p>
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-                {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <p class="text-center text-muted my-3 flex-grow-1">No tasks in this group.</p>
+                                {% endif %}
+                            </div>
 
+                            <!-- Card Footer with Add Task Button -->
+                            <div class="card-footer bg-white text-center">
+                                <a href="{% url 'create_task_in_group_page' group.id %}" class="btn btn-sm btn-primary">
+                                    Add Task
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                </div>
             </div>
 
 {% endif %}

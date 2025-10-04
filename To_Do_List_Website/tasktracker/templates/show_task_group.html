@@ -15,49 +15,136 @@
 
   <!-- Group Description -->
   {% if group.description %}
-    <p class="text-center fs-5 mb-4">{{ group.description }}</p>
+  <p class="text-center fs-5 mb-4">{{ group.description }}</p>
   {% else %}
-    <p class="text-center fs-5 mb-4">No Description Provided</p>
+  <p class="text-center fs-5 mb-4">No Description Provided</p>
   {% endif %}
 
-  <!-- Buttons -->
-  <div class="text-center">
+  <!-- Edit & Delete Buttons -->
+  <div class="text-center mb-4">
     <a href="{% url 'edit_task_group_page' group.id %}" class="btn btn-info btn-md w-10">Edit Group</a>
+
     <!-- Delete button (triggers modal) -->
-    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGroupModal{{ group.id }}"> Delete Group </button>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGroupModal{{ group.id }}">
+      Delete Group
+    </button>
+  </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="deleteGroupModal{{ group.id }}" tabindex="-1"
-         aria-labelledby="deleteGroupModalLabel{{ group.id }}" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteGroupModalLabel{{ group.id }}">
-              Delete "{{ group.title }}"?
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-
-          <div class="modal-body">
-            <p>
-              Deleting this group will also <strong>delete all associated tasks</strong>.
-              Are you sure you want to continue?
-            </p>
-          </div>
-
-          <div class="modal-footer">
-            <form method="post" action="{% url 'delete_task_group' group.id %}">
-              {% csrf_token %}
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-danger">Yes, delete</button>
-            </form>
-          </div>
-
-        </div>
+  <!-- Tasks List -->
+  <div class="d-flex flex-column gap-3 align-items-center"> <!-- center cards -->
+    {% if tasks %}
+    {% for task in tasks %}
+    {% if task.parent_task is None %}
+    <div class="card p-3 w-100" style="max-width: 600px;"> <!-- limit width -->
+      <div class="d-flex flex-row align-items-center mb-2">
+        <input type="checkbox" class="task-checkbox form-check-input flex-shrink-0 me-2"
+               data-task-id="{{ task.id }}"
+               {% if task.completed %}checked{% endif %}>
+        <a href="{% url 'show_task_page' task.id %}"
+           class="task-link task-title text-body text-decoration-none
+                    {% if task.urgency >= 3 %} fw-bold {% endif %}
+                    {% if task.urgency >= 4 %} text-decoration-underline {% endif %}
+                    {% if task.completed %} text-decoration-line-through {% endif %}">
+          {{ task.title }}
+        </a>
       </div>
-    </div>
 
+      <small class="text-muted mb-2">
+        {% if task.urgency == 5 %}
+        <img src="{% static 'images/exclamation-circle.svg' %}" width="16" height="16" class="me-1 text-danger">
+        {{ task.due_date }}
+        {% else %}
+        <img src="{% static 'images/calendar-event.svg' %}" width="16" height="16" class="me-1">
+        {{ task.due_date }}
+        {% endif %}
+      </small>
+
+      <!-- Subtasks -->
+      {% with subtasks=task.subtask_set.all %}
+      <div class="d-flex flex-column gap-2 align-items-start">
+        {% for subtask in subtasks %}
+        <div class="card p-2 d-inline-flex flex-row align-items-center w-100">
+          <input class="task-checkbox form-check-input flex-shrink-0 me-2"
+                 type="checkbox"
+                 data-task-id="{{ subtask.id }}"
+                 data-parent-id="{{ task.id }}"
+                 {% if task.completed or subtask.completed %}checked{% endif %}>
+          <div>
+            <a href="{% url 'show_task_page' subtask.id %}"
+               class="task-link task-title text-body text-decoration-none
+                        {% if subtask.urgency >= 3 %} fw-bold {% endif %}
+                        {% if subtask.urgency >= 4 %} text-decoration-underline {% endif %}
+                        {% if task.completed or subtask.completed %} text-decoration-line-through {% endif %}">
+              {{ subtask.title }}
+            </a>
+            <small class="d-block text-body-secondary">
+              {% if subtask.urgency == 5 %}
+              <img src="{% static 'images/exclamation-circle.svg' %}" width="16" height="16" class="me-1 text-danger">
+              {{ subtask.due_date }}
+              {% else %}
+              <img src="{% static 'images/calendar-event.svg' %}" width="16" height="16" class="me-1">
+              {{ subtask.due_date }}
+              {% endif %}
+            </small>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endwith %}
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    <p class="text-center text-muted my-3">No tasks in this group.</p>
+    {% endif %}
+  </div>
+
+  <!-- Add Task Button -->
+  <div class="text-center mb-4">
+    <br>
+    <a href="{% url 'create_task_in_group_page' group.id %}" class="btn btn-primary btn-md w-10">Add Task</a>
+  </div>
+
+</div>
+
+<!-- Delete Group Modal -->
+<div class="modal fade" id="deleteGroupModal{{ group.id }}" tabindex="-1"
+     aria-labelledby="deleteGroupModalLabel{{ group.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteGroupModalLabel{{ group.id }}">
+          Delete "{{ group.title }}"?
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Deleting this group will also <strong>delete all associated tasks</strong>.
+          Are you sure you want to continue?
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <form method="post" action="{% url 'delete_task_group' group.id %}">
+          {% csrf_token %}
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Yes, delete</button>
+        </form>
+      </div>
+
+    </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<!--Django will generate the correct base URL for toggling-->
+<script>
+  window.toggleTaskUrlTemplate = "{% url 'toggle_task' 0 %}".replace("0", "{id}");
+</script>
+<script src="{% static 'tasks/task_toggle.js' %}" defer></script>
 {% endblock %}

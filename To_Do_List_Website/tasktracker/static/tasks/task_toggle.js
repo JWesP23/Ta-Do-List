@@ -19,8 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const csrftoken = getCSRFToken();
 
     function updateStrikethrough(checkbox) {
-        const title = checkbox.closest("label, .card")?.querySelector(".task-title");
-        if (title) title.classList.toggle("text-decoration-line-through", checkbox.checked);
+        const listItem = checkbox.closest("li.list-group-item");
+        const title = listItem?.querySelector(".task-title");
+        if (title) {
+            title.classList.toggle("text-decoration-line-through", checkbox.checked);
+        }
     }
 
     function updateParentFromSubtasks(parentId) {

@@ -1,0 +1,8 @@
+asgiref==3.9.1
+Django==5.2.6
+MarkupSafe==3.0.2
+psycopg2==2.9.10
+sqlparse==0.5.3
+tzdata==2025.2
+WTForms==3.2.1
+WTForms-Django==0.1

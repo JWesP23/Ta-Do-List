@@ -12,4 +12,5 @@ urlpatterns = [
     path("create_task_group/", views.create_task_group, name="create_task_group_page"),
     path("edit_task_group/<int:task_group_id>", views.edit_task_group, name="edit_task_group_page"),
     path("delete_task_group/<int:task_group_id>", views.delete_task_group, name="delete_task_group"),
+    path("create_task_in_group/<int:task_group_id>", views.create_task_in_group, name="create_task_in_group_page"),
 ]

@@ -42,6 +42,12 @@ def main(request):
             'group_task_pairs': group_task_pairs,
         }
 
+        #If the user has no tasks send an empty group_task_pairs to trigger the banner prompting new users to get started
+        if not users_tasks:
+            context = {
+                'group_task_pairs': [],
+            }
+
     else:
         context = {
             'group_task_pairs': [],
@@ -108,7 +114,7 @@ def create_task(request):
 
         task_form = TaskForm(request.POST, user= request.user) # create a form instance and populate it with data from the request
 
-        # check whether it's valid
+        #check whether submission is valid
         if task_form.is_valid():
             task = task_form.save(commit= False)  #save form data without commiting to DB
             task.user = request.user #attach the user to the task
@@ -120,6 +126,32 @@ def create_task(request):
         task_form = TaskForm(user= request.user) # create a blank form instance
 
     return render(request, "create_task.html", { "form" : task_form })
+
+
+
+# Create a new task within a specified group (used for 'add task' buttons in group cards on main page)
+@login_required_401
+def create_task_in_group(request, task_group_id):
+
+    group = get_object_or_404(TaskGroup, pk= task_group_id, user= request.user)
+
+    if request.method == "POST":
+
+        task_form = SubtaskForm(request.POST) # create a form instance and populate it with data from the request | Use subtask form because it is same as task form with no group dropdown
+
+        #check whether submission is valid
+        if task_form.is_valid():
+            task = task_form.save(commit= False)  #save form data without commiting to DB
+            task.user = request.user #attach the user to the task
+            task.completed = False #all tasks should start uncompleted
+            task.group = group
+            task.save() #commit form data and metadata (the user who created the task) to DB
+            return redirect("home_page")
+
+    else: #request is GET
+        task_form = SubtaskForm() # create a blank form instance | Use subtask form because it is same as task form with no group dropdown
+
+    return render(request, "create_group_task.html", { "form" : task_form , "group" : group})
 
 
 
@@ -272,12 +304,15 @@ def show_task_group(request, task_group_id):
     #Find the appropriate task group
     group = get_object_or_404(TaskGroup, id=task_group_id, user=request.user)
 
+    #Find any tasks in this group
+    tasks = Task.objects.filter(group = group, user=request.user).order_by('completed', 'due_date') #order completed tasks at the bottom and then order by deadline
+
     #Deny users who do not own the group
     if not request.user == group.user:
         return render(request, "403.html")
 
 
-    return render(request, "show_task_group.html", {"group": group})
+    return render(request, "show_task_group.html", {"group": group, "tasks": tasks})
 
 
 

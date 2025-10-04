@@ -1,0 +1,51 @@
+{% extends "master.html" %}
+{% load form_tags %}
+
+{% block title %}
+Create "{{ group.title }}" Task
+{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center">
+  <!-- Underlined title -->
+  <h1 class="mb-4 text-center" style="text-decoration: underline;">Create A Task In Group: "{{ group.title }}"</h1>
+
+  <!-- Centered form -->
+  <form action="{% url 'create_task_in_group_page' group.id %}" method="post" class="w-100" style="max-width: 500px;">
+    {% csrf_token %}
+
+    <div class="mb-3 row">
+      <label for="{{ form.title.id_for_label }}" class="col-sm-3 col-form-label">Title:</label>
+      <div class="col-sm-9">
+        {{ form.title|add_class:"form-control" }}
+      </div>
+    </div>
+
+    <div class="mb-3 row">
+      <label for="{{ form.description.id_for_label }}" class="col-sm-3 col-form-label">Description:</label>
+      <div class="col-sm-9">
+        {{ form.description|add_class:"form-control" }}
+      </div>
+    </div>
+
+    <div class="mb-3 row">
+      <label for="{{ form.urgency.id_for_label }}" class="col-sm-3 col-form-label">Urgency:</label>
+      <div class="col-sm-9">
+        {{ form.urgency|add_class:"form-select" }}
+      </div>
+    </div>
+
+    <div class="mb-3 row">
+      <label for="{{ form.due_date.id_for_label }}" class="col-sm-3 col-form-label">Due date:</label>
+      <div class="col-sm-9">
+        {{ form.due_date|add_class:"form-control" }}
+      </div>
+    </div>
+
+    <div class="text-center mt-3">
+      <input type="submit" class="btn btn-primary" value="Create">
+    </div>
+  </form>
+
+</div>
+{% endblock %}
