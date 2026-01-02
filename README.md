@@ -61,7 +61,7 @@ pip package manager
 
 Clone the repository:
 ```bash
-git clone https://github.com/JWesP23/To-Do-List-Website
+git clone https://github.com/JWesP23/Ta-Do-List
 cd Ta-Do-List/
 ```
 
