@@ -33,7 +33,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", print(secrets.token_urlsafe(50)))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://ta-do-list.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['ta-do-list.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -137,7 +137,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "To_Do_List_Website" / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
