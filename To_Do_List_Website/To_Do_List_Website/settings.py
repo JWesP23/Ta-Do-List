@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import secrets
 
 """
 Django settings for To_Do_List_Website project.
@@ -27,18 +28,12 @@ else:
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY", print(secrets.token_urlsafe(50)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-#TODO
-'''Important: When DEBUG = False, Django requires you to specify the hosts you will allow this Django project to run from.
-
-In production, this should be replaced with a proper domain name:
-
-ALLOWED_HOSTS = ['yourdomain.com']'''
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://ta-do-list.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition

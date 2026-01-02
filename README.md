@@ -44,9 +44,9 @@ This project focuses on clean design, ease of use, and a hierarchical system of 
 
 ## Getting Started
 
-The easiest way to use this project is through the Streamlit Community Cloud by clicking on this link: https://dsa-visualizer-ec2en446yacdpgrm9gcaxu.streamlit.app/
+The easiest way to view this project is through Render by clicking on this link: https://ta-do-list.onrender.com
 
-Note: This project will run a bit slower on Streamlit Community Cloud than it will running locally. This is only really a problem when using the "instant" speed setting.
+Note: Using the app through Render is for demonstration only, there is no persistent storage on Render as that would require a paid PostgreSQL plan. When viewing the app on Render, SQLite will be used instead of PostgreSQL.
 
 Otherwise, if you'd like to run this project on your own machine, follow the steps below.
 
@@ -61,7 +61,7 @@ pip package manager
 Clone the repository:
 ```bash
 git clone https://github.com/JWesP23/To-Do-List-Website
-cd To-Do-List-Website/
+cd Ta-Do-List/
 ```
 
 ### Create a virtual environment (recommended):
@@ -148,7 +148,7 @@ Deleting any task group will trigger a cascade that deletes any tasks within the
 
 ## Project Structure
 <pre>
-To-Do-List-Website/<br>
+Ta-Do-List/<br>
 ├── To_Do_List_Website/      # Root Django project directory, contains all application code
     ├── members/             # Django app handling user accounts, including registration, login, and authentication
         ├── views.py         # Django mandated file for functions related to members app
