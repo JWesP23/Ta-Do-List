@@ -40,6 +40,7 @@ This project focuses on clean design, ease of use, and a hierarchical system of 
 - **MarkupSafe** 3.0.2 – Safe string handling for templates
 - **sqlparse** 0.5.3 – SQL parsing utilities
 - **tzdata** 2025.2 – Time zone data support
+- **gunicorn** 22.2.0 - Serves Django App to web
 - **python-dotenv** 1.2.1 - For reading environmental variables in settings.py
 
 ## Getting Started
