@@ -103,7 +103,7 @@ Otherwise, the app will run SQLite locally.
 ### Running the Visualizer
 
 ```bash
-python Ta_Do_List/manage.py runserver
+python To_Do_List_Website/manage.py runserver
 ```
 
 In your terminal you'll see a link similar to:<br><code>"Starting development server at http://127.0.0.1:8000/"</code>
